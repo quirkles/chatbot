@@ -1,6 +1,6 @@
 import { inject, injectable } from "tsyringe";
 
-import { chatModelSchema, ChatModel } from "../../../../models/chatModel";
+import { chatModelSchema, ChatModel } from "../../../../models";
 import { Db } from "../../Db";
 import { CrudBase } from "../BaseCrud";
 

@@ -18,15 +18,25 @@ async function main(): Promise<void> {
   const chatsResult = await chatService.fetchMany();
 
   if (chatsResult.isErr()) {
-    console.error("Error fetching chats");
-    console.error(chatsResult.unwrap());
+    appLogger.error("Error fetching chats", {
+      err: chatsResult.getErr(),
+    });
+    throw chatsResult.getErr();
   }
 
-  const chats = chatsResult.unwrap();
+  if (chatsResult.isOk()) {
+    const chats = chatsResult.unwrap();
 
-  appLogger.debug("Fetched chats", { chats });
+    appLogger.debug("Fetched chats", { chats });
 
-  await selectChatOrCreate(chats);
+    const activeChat = await selectChatOrCreate(chats);
+
+    if (activeChat) {
+      appLogger.debug("Selected chat", { activeChat });
+    } else {
+      appLogger.debug("No active chat selected");
+    }
+  }
 }
 
 main()

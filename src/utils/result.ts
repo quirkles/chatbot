@@ -4,10 +4,23 @@ export class Result<T, E extends Error> {
   ): Promise<Result<T, E>> {
     try {
       const value = await promise;
-      return new Result<T, E>(value, null);
+      return new Result<T, never>(value, null);
     } catch (err) {
-      return new Result<T, E>(null, err as E);
+      return new Result<never, E>(null, err as E);
     }
+  }
+
+  static WrapFn<
+    F extends (...args: Parameters<F>) => ReturnType<F>,
+    E extends Error,
+  >(fn: F): (...args: Parameters<F>) => Result<ReturnType<F>, E> {
+    return (...args: Parameters<F>): Result<ReturnType<F>, E> => {
+      try {
+        return new Result<ReturnType<F>, never>(fn(...args), null);
+      } catch (err) {
+        return new Result<never, E>(null, err as E);
+      }
+    };
   }
 
   private readonly ok: T | null = null; // value
@@ -28,13 +41,13 @@ export class Result<T, E extends Error> {
     }
   }
 
-  unwrap(): T {
+  unwrap(this: Result<T, E>): this extends Result<T, never> ? T : T | E {
     if (this.isOk()) {
       return this.ok as T;
     }
 
     if (this.isErr()) {
-      throw this.err as E;
+      throw this.getErr();
     }
 
     throw new Error("Result must have a value or an error");
@@ -53,15 +66,15 @@ export class Result<T, E extends Error> {
     throw new Error(msg);
   }
 
-  isOk(): this is Result<T, never> {
+  isOk(this: Result<T, E>): this is Result<T, never> {
     return this.ok !== null;
   }
 
-  isErr(): this is Result<never, E> {
+  isErr(this: Result<T, E>): this is Result<never, E> {
     return this.err !== null;
   }
 
-  getErr(): this extends Result<never, E> ? E : E | null {
+  getErr(this: Result<T, E>): this extends Result<never, E> ? E : E | null {
     return this.err as E;
   }
 }

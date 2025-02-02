@@ -3,9 +3,8 @@ import path from "node:path";
 import * as fs from "node:fs";
 import { createInterface } from "node:readline";
 
-const DEFAULT_MONGO_URL =
-  "mongodb://localhost:27017/?retryWrites=true&w=majority";
-const DEFAULT_MONGO_DB = "chatbot.quirkles.com";
+const DEFAULT_MONGO_URL = "mongodb://localhost:27017";
+const DEFAULT_MONGO_DB = "com_quirkles_chatbot";
 
 const LOGFILE_PATH = path.join(
   __dirname,
