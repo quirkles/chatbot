@@ -3,8 +3,9 @@ import { container } from "tsyringe";
 
 import { getConfig } from "./config";
 import { initContainer } from "./container";
-import { ChatCrud, type Logger } from "./services";
+import { AppState, ChatCrud, Logger } from "./services";
 import { selectChatOrCreate } from "./prompts";
+import { App } from "./app";
 
 async function main(): Promise<void> {
   const config = await getConfig();
@@ -12,6 +13,8 @@ async function main(): Promise<void> {
 
   const chatService = container.resolve<ChatCrud>(ChatCrud);
   const appLogger = container.resolve<Logger>("Logger");
+  const appState = container.resolve(AppState);
+  const app = container.resolve(App);
 
   appLogger.info("Starting app");
 
@@ -33,8 +36,19 @@ async function main(): Promise<void> {
 
     if (activeChat) {
       appLogger.debug("Selected chat", { activeChat });
+      appState.set("selectedChatId", activeChat.id);
+      await appState.fetchHistoryForSelectedChat();
     } else {
       appLogger.debug("No active chat selected");
+    }
+
+    appLogger.info("App started");
+    while (true) {
+      const result = await app.tick();
+      console.log("tick result", result);
+      if (result instanceof AbortSignal) {
+        break;
+      }
     }
   }
 }

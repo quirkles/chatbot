@@ -33,6 +33,7 @@
     "@mobily/ts-belt": "^3.13.1",
     "commander": "^13.1.0",
     "mongodb": "^6.13.0",
+    "openai": "^4.82.0",
     "pino": "^9.6.0",
     "reflect-metadata": "^0.2.2",
     "tsyringe": "^4.8.0",

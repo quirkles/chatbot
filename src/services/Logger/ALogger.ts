@@ -63,7 +63,7 @@ type ILogger = {
   child: (options?: LoggerOptions) => ILogger;
 };
 
-export abstract class Logger implements ILogger {
+export abstract class ALogger implements ILogger {
   abstract debug: LogFn;
   abstract info: LogFn;
   abstract notice: LogFn;
@@ -72,7 +72,7 @@ export abstract class Logger implements ILogger {
   abstract critical: LogFn;
   abstract alert: LogFn;
   abstract emergency: LogFn;
-  abstract child(options?: LoggerOptions): Logger;
+  abstract child(options?: LoggerOptions): ALogger;
   protected constructor(protected options?: LoggerOptions) {
     return;
   }

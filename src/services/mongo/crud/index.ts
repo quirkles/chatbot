@@ -1,2 +1,3 @@
 export { CrudBase } from "./BaseCrud";
-export { ChatCrud } from "./chats/chats";
+export { ChatCrud } from "./Chat";
+export { MessageCrud } from "./Message";

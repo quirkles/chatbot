@@ -7,14 +7,14 @@ import { v4 } from "uuid";
 import { deepMerge } from "../../utils/object";
 
 import {
-  Logger,
+  ALogger,
   LogFn,
   LoggerOptions,
   LogJson,
   LogLevel,
   logLevels,
   severities,
-} from "./Logger";
+} from "./ALogger";
 
 export function createPinoLogger(
   config: {
@@ -113,7 +113,7 @@ export function createPinoLogger(
 }
 
 @singleton()
-class PinoLogger extends Logger {
+export class PinoLogger extends ALogger {
   private readonly config: LoggerOptions;
   private readonly pLogger: PLogger<LogLevel>;
   constructor();
@@ -137,7 +137,7 @@ class PinoLogger extends Logger {
     }
   }
 
-  child(optionOverrides: LoggerOptions = {}): Logger {
+  child(optionOverrides: LoggerOptions = {}): ALogger {
     const {
       _LOG_META_loggerInstanceUuid: parentLoggerInstanceUuid,
       _LOG_META_name: parentName,
@@ -210,7 +210,7 @@ class PinoLogger extends Logger {
   }
 }
 
-export function createLogger(options: LoggerOptions): Logger {
+export function createLogger(options: LoggerOptions): ALogger {
   return new PinoLogger(options);
 }
 

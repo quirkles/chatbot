@@ -63,27 +63,28 @@ export abstract class CrudBase<T extends BaseModel> {
 
   public fetchMany(
     params: {
-      filter: Partial<T>;
-      orderBy: [keyof T, "asc" | "desc"];
-      limit: number;
-      skip: number;
-    } = {
-      filter: {},
-      orderBy: ["createdAt", "desc"],
-      limit: 10,
-      skip: 0,
-    },
+      filter?: Partial<T>;
+      orderBy?: [keyof T, "asc" | "desc"];
+      limit?: number;
+      skip?: number;
+    } = {},
   ): PromisedResult<T[]> {
+    const { filter, orderBy, limit, skip } = params;
     return Result.FromPromise(
       this.db
         .getCollection(this.collectionName)
         .then((collection) => {
-          return collection
-            .find(params.filter)
-            .sort({ [params.orderBy[0]]: params.orderBy[1] })
-            .limit(params.limit)
-            .skip(params.skip)
-            .toArray();
+          let query = collection.find(filter || {});
+          if (orderBy) {
+            query = query.sort({ [orderBy[0]]: orderBy[1] });
+          }
+          if (limit) {
+            query = query.limit(limit);
+          }
+          if (skip) {
+            query = query.skip(skip);
+          }
+          return query.toArray();
         })
         .then((results) => {
           return results.map((result) => {

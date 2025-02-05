@@ -1,17 +1,23 @@
-import { ChatModel } from "../../models";
-import { singleton } from "tsyringe";
+import { inject, singleton } from "tsyringe";
+
+import { ChatModel, MessageModel } from "../../models";
 import { createMapKeyedOn } from "../../utils";
-import {deepMerge} from "../../utils/object";
+import { deepMerge } from "../../utils/object";
+import { MessageCrud } from "../mongo";
 
 interface State {
-  selectedChatId?: ChatModel;
+  selectedChatId?: string;
   chats?: ChatModel[];
+  selectedChatHistory?: MessageModel[];
 }
 
 @singleton()
 export class AppState {
   private readonly state: State = {};
-  constructor(initialState?: State) {
+  constructor(
+    @inject(MessageCrud) private messageCrud: MessageCrud,
+    initialState: State = {},
+  ) {
     this.state = initialState || {};
   }
   public get<T extends keyof State>(field: T): State[T] {
@@ -37,5 +43,22 @@ export class AppState {
       [],
     );
     this.state.chats.push(...Object.values(chatMap));
+  }
+
+  async fetchHistoryForSelectedChat(): Promise<void> {
+    const selectedChatId = this.state.selectedChatId;
+    if (!selectedChatId) {
+      return;
+    }
+    this.messageCrud
+      .fetchMany({
+        filter: { chatId: selectedChatId },
+      })
+      .then((result) => {
+        if (result.isOk()) {
+          console.log("fetchHistoryForSelectedChat", result.unwrap());
+          this.state.selectedChatHistory = result.unwrap();
+        }
+      });
   }
 }
