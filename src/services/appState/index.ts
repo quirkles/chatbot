@@ -56,8 +56,7 @@ export class AppState {
       })
       .then((result) => {
         if (result.isOk()) {
-          console.log("fetchHistoryForSelectedChat", result.unwrap());
-          this.state.selectedChatHistory = result.unwrap();
+          const threads = result.unwrap();
         }
       });
   }
