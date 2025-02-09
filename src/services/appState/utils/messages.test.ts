@@ -4,13 +4,14 @@ import {add, sub} from "date-fns";
 import {MessageModel} from "../../../models";
 import {createMessageThreads} from "./messages";
 import {shuffle} from "../../../utils/array";
+import {ObjectId} from "mongodb";
 
 describe("messages", () => {
     describe("createMessageThreads", () => {
         it('should create thread from messages with linear dependencies', () => {
             const messages: MessageModel[] = [
                 {
-                    id: '1',
+                    _id: new ObjectId("1"),
                     type: 'QUESTION',
                     chatId: 'chat1',
                     question: 'First question',
@@ -19,7 +20,7 @@ describe("messages", () => {
                     updatedAt: new Date()
                 },
                 {
-                    id: '2',
+                    _id: new ObjectId("2"),
                     type: 'ANSWER',
                     chatId: 'chat1',
                     answer: 'First answer',
@@ -29,7 +30,7 @@ describe("messages", () => {
                     updatedAt: new Date()
                 },
                 {
-                    id: '3',
+                    _id: new ObjectId("3"),
                     type: 'QUESTION',
                     chatId: 'chat1',
                     question: 'Second question',
@@ -38,7 +39,7 @@ describe("messages", () => {
                     updatedAt: new Date()
                 },
                 {
-                    id: '4',
+                    _id: new ObjectId("4"),
                     type: 'ANSWER',
                     chatId: 'chat1',
                     answer: 'Second answer',
@@ -48,7 +49,7 @@ describe("messages", () => {
                     updatedAt: new Date()
                 },
                 {
-                    id: '5',
+                    _id: new ObjectId("5"),
                     type: 'QUESTION',
                     chatId: 'chat1',
                     question: 'Third question',
@@ -57,7 +58,7 @@ describe("messages", () => {
                     updatedAt: new Date()
                 },
                 {
-                    id: '6',
+                    _id: new ObjectId("6"),
                     type: 'ANSWER',
                     chatId: 'chat1',
                     answer: 'Third answer',
@@ -75,12 +76,12 @@ describe("messages", () => {
 
                 expect(threads).toHaveLength(1);
                 expect(threads[0]).toHaveLength(6);
-                expect(threads[0][0].id).toBe('1');
-                expect(threads[0][1].id).toBe('2');
-                expect(threads[0][2].id).toBe('3');
-                expect(threads[0][3].id).toBe('4');
-                expect(threads[0][4].id).toBe('5');
-                expect(threads[0][5].id).toBe('6');
+                expect(threads[0][0]._id.toString()).toBe('1');
+                expect(threads[0][1]._id.toString()).toBe('2');
+                expect(threads[0][2]._id.toString()).toBe('3');
+                expect(threads[0][3]._id.toString()).toBe('4');
+                expect(threads[0][4]._id.toString()).toBe('5');
+                expect(threads[0][5]._id.toString()).toBe('6');
             }
 
         });
@@ -88,7 +89,7 @@ describe("messages", () => {
             const baseDate = sub(new Date(), {days: 1});
             const messages: MessageModel[] = [
                 {
-                    id: '1',
+                    _id: new ObjectId("1"),
                     type: 'QUESTION',
                     chatId: 'chat1',
                     question: 'First question',
@@ -97,7 +98,7 @@ describe("messages", () => {
                     updatedAt: new Date()
                 },
                 {
-                    id: '2',
+                    _id: new ObjectId("2"),
                     type: 'ANSWER',
                     chatId: 'chat1',
                     answer: 'First answer',
@@ -107,7 +108,7 @@ describe("messages", () => {
                     updatedAt: new Date()
                 },
                 {
-                    id: '4',
+                    _id: new ObjectId("3"),
                     type: 'ANSWER',
                     chatId: 'chat1',
                     answer: 'Second answer',
@@ -117,7 +118,7 @@ describe("messages", () => {
                     updatedAt: new Date()
                 },
                 {
-                    id: '5',
+                    _id:    new ObjectId("4"),
                     type: 'QUESTION',
                     chatId: 'chat1',
                     question: 'Third question',
@@ -126,7 +127,7 @@ describe("messages", () => {
                     updatedAt: new Date()
                 },
                 {
-                    id: '6',
+                    _id: new ObjectId("5"),
                     type: 'ANSWER',
                     chatId: 'chat1',
                     answer: 'Third answer',
@@ -145,11 +146,11 @@ describe("messages", () => {
                 expect(threads).toHaveLength(2);
                 expect(threads[0]).toHaveLength(2);
                 expect(threads[1]).toHaveLength(3);
-                expect(threads[0][0].id).toBe('1');
-                expect(threads[0][1].id).toBe('2');
-                expect(threads[1][0].id).toBe('4');
-                expect(threads[1][1].id).toBe('5');
-                expect(threads[1][2].id).toBe('6');
+                expect(threads[0][0]._id.toString()).toBe('1');
+                expect(threads[0][1]._id.toString()).toBe('2');
+                expect(threads[1][0]._id.toString()).toBe('4');
+                expect(threads[1][1]._id.toString()).toBe('5');
+                expect(threads[1][2]._id.toString()).toBe('6');
             }
         });
     });

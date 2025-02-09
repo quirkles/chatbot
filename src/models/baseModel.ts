@@ -1,7 +1,8 @@
+import { ObjectId } from "mongodb";
 import { z } from "zod";
 
 export const BaseModelSchema = z.object({
-  id: z.string(),
+  _id: z.instanceof(ObjectId),
   createdAt: z.date(),
   updatedAt: z.date(),
 });

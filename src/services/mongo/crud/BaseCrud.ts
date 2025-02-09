@@ -1,5 +1,6 @@
 import { inject } from "tsyringe";
-import { ZodObject, ZodSchema, ZodTypeAny } from "zod";
+import { ZodSchema } from "zod";
+import { ObjectId } from "mongodb";
 
 import { PromisedResult, Result } from "../../../utils/result";
 import { Db } from "../Db";
@@ -18,12 +19,11 @@ export abstract class CrudBase<T extends BaseModel> {
     this.schema = schema;
   }
 
-  public async create(data: Omit<T, "id">): Promise<Result<T, Error>> {
-    const result = (this.schema as ZodObject<{ id: ZodTypeAny }>)
-      .omit({
-        id: true,
-      })
-      .safeParse(data);
+  public async create(data: Omit<T, "_id">): Promise<Result<T, Error>> {
+    const result = this.schema.safeParse({
+      _id: new ObjectId(),
+      ...data,
+    });
     if (!result.success) {
       return Result.FromPromise(Promise.reject(result.error));
     }
@@ -43,17 +43,17 @@ export abstract class CrudBase<T extends BaseModel> {
     );
   }
 
-  public fetchOne(id: string): PromisedResult<T> {
+  public fetchOne(_id: string): PromisedResult<T> {
     return Result.FromPromise(
       this.db
         .getCollection(this.collectionName)
         .then((collection) => {
-          return collection.findOne({ id });
+          return collection.findOne({ _id: new ObjectId(_id) });
         })
         .then((result) => {
           if (!result) {
             throw new Error(
-              `No ${this.collectionName} document found with id ${id}`,
+              `No ${this.collectionName} document found with id ${_id}`,
             );
           }
           return this.schema.parse(result);
@@ -88,11 +88,7 @@ export abstract class CrudBase<T extends BaseModel> {
         })
         .then((results) => {
           return results.map((result) => {
-            const { _id, ...rest } = result;
-            return this.schema.parse({
-              id: _id.toString(),
-              ...rest,
-            });
+            return this.schema.parse(result);
           });
         }),
     );

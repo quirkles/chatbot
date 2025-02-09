@@ -1,4 +1,4 @@
-export class Result<T, E extends Error> {
+export class Result<T, E extends Error = Error> {
   static async FromPromise<T, E extends Error>(
     promise: Promise<T>,
   ): Promise<Result<T, E>> {

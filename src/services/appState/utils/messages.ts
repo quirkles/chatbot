@@ -3,14 +3,21 @@ import { MessageModel } from "../../../models";
 export function createMessageThreads(
   messages: MessageModel[],
 ): MessageModel[][] {
+  if (messages.length === 0) {
+    return [];
+  }
   const [head, ...tail] = messages;
   const threads: MessageModel[][] = [];
   let thread: MessageModel[] = [head];
   while (tail.length > 0) {
     const { precededBy } = thread[0];
-    const { id } = thread[thread.length - 1];
-    const nextIndex = tail.findIndex((message) => message.precededBy === id);
-    const priorIndex = tail.findIndex((message) => message.id === precededBy);
+    const { _id } = thread[thread.length - 1];
+    const nextIndex = tail.findIndex(
+      (message) => message.precededBy === _id.toString(),
+    );
+    const priorIndex = tail.findIndex(
+      (message) => message._id.toString() === precededBy,
+    );
 
     if (nextIndex === -1 && priorIndex === -1) {
       threads.push(thread);

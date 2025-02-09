@@ -3,16 +3,15 @@ import { BaseModelSchema } from "./baseModel";
 
 const commonSchema = BaseModelSchema.extend({
   type: z.enum(["QUESTION", "ANSWER"]),
-  id: z.string(),
-  chatId: z.string(),
+  chatId: z.string().nullable(),
   precededBy: z.string().nullable(),
   createdAt: z.date(),
   updatedAt: z.date(),
 });
 
 export const answerModelSchema = commonSchema.extend({
-  answer: z.string(),
-  reasoning: z.string(),
+  answer: z.string().nullable(),
+  reasoning: z.string().nullable(),
   type: z.literal("ANSWER"),
 });
 
@@ -31,3 +30,13 @@ export const messageModelSchema = z.discriminatedUnion("type", [
 ]);
 
 export type MessageModel = z.infer<typeof messageModelSchema>;
+
+export function messageIsQuestion(
+  message: MessageModel,
+): message is QuestionModel {
+  return message.type === "QUESTION";
+}
+
+export function messageIsAnswer(message: MessageModel): message is AnswerModel {
+  return message.type === "ANSWER";
+}

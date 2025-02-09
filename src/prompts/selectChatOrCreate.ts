@@ -68,7 +68,7 @@ export async function selectChat(
       new Separator(),
       ...chats.map((chat) => ({
         name: chat.chatName,
-        value: chat.id,
+        value: chat._id.toString(),
       })),
     ],
   });
@@ -91,5 +91,5 @@ export async function selectChat(
     );
   }
 
-  return chats.find((chat) => chat.id === selected)!;
+  return chats.find((chat) => chat._id.toString() === selected)!;
 }

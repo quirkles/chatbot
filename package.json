@@ -3,8 +3,9 @@
   "version": "1.0.0",
   "main": "index.js",
   "scripts": {
-    "tsc": "tsc",
-    "test": "jest"
+    "build": "tsc",
+    "test": "jest",
+    "start": "npm run build && node dist/main.js"
   },
   "keywords": [],
   "author": "",
@@ -31,6 +32,7 @@
   "dependencies": {
     "@inquirer/prompts": "^7.3.1",
     "@mobily/ts-belt": "^3.13.1",
+    "chalk": "^5.4.1",
     "commander": "^13.1.0",
     "date-fns": "^4.1.0",
     "mongodb": "^6.13.0",

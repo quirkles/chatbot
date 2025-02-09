@@ -2,10 +2,14 @@ import OpenAI from "openai";
 import { inject, injectable } from "tsyringe";
 
 import { getConfig } from "../../config";
-import { QuestionModel } from "../../models/questionModel";
-import { AnswerModel } from "../../models/answerModel";
 import { Logger } from "../Logger";
-import { AppState } from "../appState";
+import { AnswerModel, MessageModel, QuestionModel } from "../../models";
+import { messageIsAnswer, messageIsQuestion } from "../../models/messageModel";
+
+interface OpenAIChatMessage {
+  role: "user" | "assistant" | "system";
+  content: string;
+}
 
 @injectable()
 export class OpenAIService {
@@ -14,10 +18,7 @@ export class OpenAIService {
   private apiUrl: string | null = null;
   private client: OpenAI | null = null;
 
-  constructor(
-    @inject("Logger") private logger: Logger,
-    @inject(AppState) private appState: AppState,
-  ) {}
+  constructor(@inject("Logger") private logger: Logger) {}
 
   async init() {
     if (this.hasInitBeenCalled) {
@@ -35,10 +36,53 @@ export class OpenAIService {
     });
   }
 
-  async ask(question: string): Promise<AnswerModel> {
+  async ask(
+    question: QuestionModel,
+    history: MessageModel[] = [],
+  ): Promise<Omit<AnswerModel, "_id">> {
     if (!this.hasInitBeenCalled) {
       throw new Error("OpenAIService has not been initialized");
     }
-    throw new Error("Not implemented");
+
+    if (!this.client) {
+      throw new Error("OpenAIService has not been initialized");
+    }
+    const messages = history
+      .map((h) => {
+        if (messageIsQuestion(h)) {
+          return {
+            role: "user",
+            content: h.question,
+          };
+        } else if (messageIsAnswer(h)) {
+          return {
+            role: "assistant",
+            content: h.answer,
+          };
+        }
+        return null;
+      })
+      .filter((m) => m !== null) as OpenAIChatMessage[];
+
+    messages.push({
+      role: "user",
+      content: question.question,
+    });
+
+    const response = await this.client.chat.completions.create({
+      model: "deepseek-reasoner",
+      messages,
+      stream: false,
+    });
+
+    return {
+      chatId: question.chatId,
+      precededBy: question._id.toString(),
+      answer: response.choices[0].message.content,
+      reasoning: response.choices[0].message.content,
+      type: "ANSWER",
+      createdAt: new Date(),
+      updatedAt: new Date(),
+    };
   }
 }

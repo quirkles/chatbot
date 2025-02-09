@@ -18,6 +18,8 @@ async function main(): Promise<void> {
 
   appLogger.info("Starting app");
 
+  await app.init();
+
   const chatsResult = await chatService.fetchMany();
 
   if (chatsResult.isErr()) {
@@ -36,16 +38,18 @@ async function main(): Promise<void> {
 
     if (activeChat) {
       appLogger.debug("Selected chat", { activeChat });
-      appState.set("selectedChatId", activeChat.id);
-      await appState.fetchHistoryForSelectedChat();
+      appState.set("selectedChatId", activeChat._id.toString());
+      await appState.populateMostRecentThreadInSelectedChatHistory();
     } else {
       appLogger.debug("No active chat selected");
     }
 
     appLogger.info("App started");
+
+    app.displayCommands();
+
     while (true) {
       const result = await app.tick();
-      console.log("tick result", result);
       if (result instanceof AbortSignal) {
         break;
       }
