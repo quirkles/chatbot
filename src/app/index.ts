@@ -97,9 +97,12 @@ export class App {
       input: process.stdin,
     });
     const command = await rl.question(
-      `(${(await this.appState.getSelectedChatName()) || "No chat selected"}): `,
+      chalk.blue(
+        `(${(await this.appState.getSelectedChatName()) || "No chat selected"}): `,
+      ),
     );
     rl.close();
+    console.log("\n" + "-".repeat(this.appState.get("stdOutColumns")) + "\n");
     switch (command) {
       case "exit":
         this.logger.info("Exiting app");
@@ -119,7 +122,9 @@ export class App {
                 }
                 return `Question > ${chalk.blue(message.question)}`;
               })
-              .join(`\n${"-".repeat(this.appState.get("stdOutColumns"))}\n`),
+              .join(
+                `\n\n${"-".repeat(this.appState.get("stdOutColumns"))}\n\n`,
+              ),
           );
         } else {
           console.log("No history found");
@@ -128,9 +133,6 @@ export class App {
       default:
         await this.ask(command)
           .then((answer) => {
-            console.log(
-              "\n" + "-".repeat(this.appState.get("stdOutColumns")) + "\n",
-            );
             console.log(chalk.green(answer.answer));
           })
           .catch((err) => {
@@ -141,5 +143,6 @@ export class App {
             console.log("Oops, something went wrong!");
           });
     }
+    console.log("\n" + "-".repeat(this.appState.get("stdOutColumns")) + "\n");
   }
 }
